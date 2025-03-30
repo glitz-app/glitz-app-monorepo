@@ -14,7 +14,7 @@ export default async function Home() {
           height={80}
           className="mb-8"
         />
-        <h1 className="mb-24 text-4xl font-bold sm:text-[5rem]">Glitz app</h1>
+        <h1 className="mb-24 text-4xl font-bold sm:text-[5rem]">Glitz</h1>
 
         <div className="col-span-1 flex justify-end">
           <SignedOut>
