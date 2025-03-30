@@ -15,12 +15,16 @@ interface ModuleWithType extends Module {
 interface ModuleCardProps {
   module: ModuleWithType;
   collapsed: boolean;
+  onOpenSettings: () => void;
 }
 
-const ModuleCard = ({ module, collapsed }: ModuleCardProps) => {
+const ModuleCard = ({ module, collapsed, onOpenSettings }: ModuleCardProps) => {
   return (
     <Card className="relative flex max-w-md flex-col overflow-hidden rounded-xl shadow-md shadow-[#BEBCFF]/10">
-      <section className="z-20 bg-white p-4 shadow-md shadow-neutral-300">
+      <section
+        className="z-20 bg-white p-4 shadow-md shadow-neutral-300 transition-all duration-200 hover:cursor-pointer hover:bg-purple-50 hover:shadow-purple-200"
+        onClick={onOpenSettings}
+      >
         <h4 className="font-medium">{module.type.name}</h4>
         <div className="absolute right-2 top-2">
           <HoverCard>

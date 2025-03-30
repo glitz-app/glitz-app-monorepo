@@ -2,83 +2,98 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Post is just an example
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([name])
+  @@index([name])
 }
 
 enum ImageProjectStatus {
-    CREATED
-    IN_PROGRESS
-    COMPLETED
-    DELETED
+  CREATED
+  IN_PROGRESS
+  COMPLETED
+  DELETED
 }
 
 model ImageProject {
-    id              String          @id @default(uuid())
-    status          String          @default("CREATED")
-    name            String?
-    userId          String
-    firstModule     Module?         @relation("FirstModule", fields: [firstModuleId], references: [id])
-    firstModuleId   String?         @unique
-    modules         Module[]
-    moduleResults   ModuleResult[]
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
+  id            String         @id @default(uuid())
+  status        String         @default("CREATED")
+  name          String?
+  userId        String
+  firstModule   Module?        @relation("FirstModule", fields: [firstModuleId], references: [id])
+  firstModuleId String?        @unique
+  modules       Module[]
+  moduleResults ModuleResult[]
+  threads       Thread[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model ModuleType {
-    id              String          @id @default(uuid())
-    name            String          @unique
-    description     String
-    isFirst         Boolean         @default(false)
-    modules         Module[]        
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  isFirst     Boolean  @default(false)
+  modules     Module[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Thread {
+  id             String       @id @default(uuid())
+  modules        Module[]
+  imageProject   ImageProject @relation(fields: [imageProjectId], references: [id])
+  imageProjectId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([imageProjectId])
 }
 
 model Module {
-    id              String          @id @default(uuid())
-    type            ModuleType      @relation(fields: [typeId], references: [id])
-    typeId          String
-    results         ModuleResult[]
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
-    imageProject    ImageProject?   @relation(fields: [imageProjectId], references: [id])
-    imageProjectId  String?
-    firstModuleFor  ImageProject?   @relation("FirstModule")
-    previousModule  Module?         @relation("ModuleChain", fields: [previousModuleId], references: [id])
-    nextModule      Module?         @relation("ModuleChain")
-    previousModuleId String?        @unique
+  id               String         @id @default(uuid())
+  type             ModuleType     @relation(fields: [typeId], references: [id])
+  typeId           String
+  results          ModuleResult[]
+  thread           Thread         @relation(fields: [threadId], references: [id])
+  threadId         String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  imageProject     ImageProject?  @relation(fields: [imageProjectId], references: [id])
+  imageProjectId   String?
+  firstModuleFor   ImageProject?  @relation("FirstModule")
+  previousModule   Module?        @relation("ModuleChain", fields: [previousModuleId], references: [id])
+  nextModule       Module?        @relation("ModuleChain")
+  previousModuleId String?        @unique
 
-    @@index([typeId])
-    @@index([imageProjectId])
+  @@index([typeId])
+  @@index([imageProjectId])
+  @@index([threadId])
 }
 
 model ModuleResult {
-    id              String          @id @default(uuid())
-    imageUrl        String
-    prompt          Json
-    module          Module          @relation(fields: [moduleId], references: [id])
-    moduleId        String
-    imageProject    ImageProject    @relation(fields: [imageProjectId], references: [id])
-    imageProjectId  String
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
+  id             String       @id @default(uuid())
+  imageUrl       String
+  prompt         Json
+  module         Module       @relation(fields: [moduleId], references: [id])
+  moduleId       String
+  imageProject   ImageProject @relation(fields: [imageProjectId], references: [id])
+  imageProjectId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-    @@index([moduleId])
-    @@index([imageProjectId])
+  @@index([moduleId])
+  @@index([imageProjectId])
 }

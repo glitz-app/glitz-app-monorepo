@@ -6,7 +6,7 @@ export const moduleResultRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        imageUrl: z.string(),
+        //@TODO imageUrl: z.string().optional(),
         prompt: z.record(z.string(), z.string()),
         moduleId: z.string(),
         imageProjectId: z.string(),
@@ -24,9 +24,12 @@ export const moduleResultRouter = createTRPCRouter({
         });
       }
 
+      // provisionally set imageurl
+      const imageUrl = "https://placehold.co/600x400";
+
       return ctx.db.moduleResult.create({
         data: {
-          imageUrl: input.imageUrl,
+          imageUrl: imageUrl,
           prompt: input.prompt,
           moduleId: input.moduleId,
           imageProjectId: input.imageProjectId,

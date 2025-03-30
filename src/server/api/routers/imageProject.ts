@@ -6,12 +6,28 @@ export const imageProjectRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.imageProject.create({
-        data: {
-          name: input.name,
-          status: "CREATED",
-          userId: ctx.userId, // Add the user ID when creating
-        },
+      // Create the project and thread in a transaction
+      return ctx.db.$transaction(async (tx) => {
+        // First create the project
+        const project = await tx.imageProject.create({
+          data: {
+            name: input.name,
+            status: "CREATED",
+            userId: ctx.userId,
+          },
+        });
+
+        // Then create a thread associated with the project
+        const thread = await tx.thread.create({
+          data: {
+            imageProjectId: project.id,
+          },
+        });
+
+        return {
+          ...project,
+          thread,
+        };
       });
     }),
 
@@ -78,6 +94,7 @@ export const imageProjectRouter = createTRPCRouter({
       z.object({
         imageProjectId: z.string(),
         moduleTypeId: z.string(),
+        threadId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -96,6 +113,7 @@ export const imageProjectRouter = createTRPCRouter({
         data: {
           typeId: input.moduleTypeId,
           imageProjectId: input.imageProjectId,
+          threadId: input.threadId,
         },
       });
 

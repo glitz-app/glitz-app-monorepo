@@ -4,7 +4,7 @@ import { imageProjectRouter } from "./routers/imageProject";
 import { moduleRouter } from "./routers/module";
 import { moduleResultRouter } from "./routers/moduleResult";
 import { moduleTypeRouter } from "./routers/moduleType";
-import { imageRouter } from "./routers/imageRouter";
+import { imageRouter } from "./routers/image";
 
 /**
  * This is the primary router for your server.

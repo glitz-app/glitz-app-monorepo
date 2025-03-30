@@ -1,14 +1,15 @@
 "use client";
 
-import ModuleCard from "@/app/_components/ModuleCard";
+import ModuleCard from "@/components/components/ModuleCard";
 import { cn } from "@/lib/utils";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import AddModuleContainer from "./AddModuleContainer";
 import { api } from "@/trpc/react";
 import type { Module, ModuleType } from "@prisma/client";
+import ModuleSettingsContainer from "./ModuleSettingsContainer";
 
-interface ModuleWithType extends Module {
+export interface ModuleWithType extends Module {
   type: ModuleType;
 }
 
@@ -23,6 +24,9 @@ const ModulesContainer: React.FC<{ projectId: string }> = ({ projectId }) => {
   const modules = imageProject?.modules;
 
   const [isAddModuleOpen, setIsAddModuleOpen] = React.useState(false);
+  const [selectedModule, setSelectedModule] =
+    React.useState<ModuleWithType | null>(null);
+
   const SIDEBAR_WIDTH = 400;
 
   const addNewModuleToProject = api.imageProject.addNewModule.useMutation({
@@ -44,6 +48,15 @@ const ModulesContainer: React.FC<{ projectId: string }> = ({ projectId }) => {
     addNewModuleToProject.mutate({ imageProjectId: projectId, moduleTypeId });
   };
 
+  const handleOpenModuleSettings = (module: ModuleWithType) => {
+    setIsAddModuleOpen(false); // Close AddModuleContainer if it's open
+    setSelectedModule(module);
+  };
+
+  const handleCloseModuleSettings = () => {
+    setSelectedModule(null);
+  };
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -53,7 +66,10 @@ const ModulesContainer: React.FC<{ projectId: string }> = ({ projectId }) => {
           "scrollbar-hide h-full overflow-y-scroll p-4 transition-all duration-200",
         )}
         style={{
-          width: isAddModuleOpen ? `calc(100% - ${SIDEBAR_WIDTH}px)` : "100%",
+          width:
+            isAddModuleOpen || selectedModule
+              ? `calc(100% - ${SIDEBAR_WIDTH}px)`
+              : "100%",
         }}
       >
         <div className="mx-auto flex max-w-md flex-col">
@@ -63,6 +79,7 @@ const ModulesContainer: React.FC<{ projectId: string }> = ({ projectId }) => {
                 <ModuleCard
                   module={module}
                   collapsed={modules.length - 1 === index ? false : true}
+                  onOpenSettings={() => handleOpenModuleSettings(module)} // Add onClick handler
                 />
                 {index < modules.length - 1 && (
                   <div className="mx-auto h-8 w-[1px] bg-gray-300" />
@@ -73,7 +90,10 @@ const ModulesContainer: React.FC<{ projectId: string }> = ({ projectId }) => {
           <div className="flex items-center justify-center pt-4">
             <AddModuleButton
               size={"3rem"}
-              onClick={() => setIsAddModuleOpen(!isAddModuleOpen)}
+              onClick={() => {
+                setSelectedModule(null);
+                setIsAddModuleOpen(!isAddModuleOpen);
+              }}
             />
           </div>
         </div>
@@ -83,6 +103,14 @@ const ModulesContainer: React.FC<{ projectId: string }> = ({ projectId }) => {
         width={SIDEBAR_WIDTH}
         starter={true}
         onClose={handleCloseAddModule}
+        onAddModule={handleAddModule}
+      />
+      <ModuleSettingsContainer
+        key={selectedModule?.id}
+        module={selectedModule}
+        projectId={projectId}
+        width={SIDEBAR_WIDTH}
+        onClose={handleCloseModuleSettings}
         onAddModule={handleAddModule}
       />
     </div>
