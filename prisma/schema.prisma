@@ -36,7 +36,6 @@ model ImageProject {
   firstModuleId String?        @unique
   modules       Module[]
   moduleResults ModuleResult[]
-  threads       Thread[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
@@ -51,24 +50,11 @@ model ModuleType {
   updatedAt   DateTime @updatedAt
 }
 
-model Thread {
-  id             String       @id @default(uuid())
-  modules        Module[]
-  imageProject   ImageProject @relation(fields: [imageProjectId], references: [id])
-  imageProjectId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  @@index([imageProjectId])
-}
-
 model Module {
   id               String         @id @default(uuid())
   type             ModuleType     @relation(fields: [typeId], references: [id])
   typeId           String
   results          ModuleResult[]
-  thread           Thread         @relation(fields: [threadId], references: [id])
-  threadId         String
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   imageProject     ImageProject?  @relation(fields: [imageProjectId], references: [id])
@@ -80,7 +66,6 @@ model Module {
 
   @@index([typeId])
   @@index([imageProjectId])
-  @@index([threadId])
 }
 
 model ModuleResult {

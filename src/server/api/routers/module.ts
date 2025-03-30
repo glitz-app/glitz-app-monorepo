@@ -9,7 +9,6 @@ export const moduleRouter = createTRPCRouter({
         typeId: z.string(),
         imageProjectId: z.string(),
         previousModuleId: z.string().optional(),
-        threadId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -28,7 +27,6 @@ export const moduleRouter = createTRPCRouter({
           typeId: input.typeId,
           imageProjectId: input.imageProjectId,
           previousModuleId: input.previousModuleId,
-          threadId: input.threadId,
         },
       });
     }),
